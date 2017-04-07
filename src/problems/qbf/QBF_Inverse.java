@@ -54,6 +54,7 @@ public class QBF_Inverse extends QBF {
 	 */
 	@Override
 	public Double evaluateExchangeQBF(int in, int out) {
+
 		return -super.evaluateExchangeQBF(in,out);
 	}
 	

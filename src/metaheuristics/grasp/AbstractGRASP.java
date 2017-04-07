@@ -147,11 +147,10 @@ public abstract class AbstractGRASP<E> {
 		incumbentCost = Double.POSITIVE_INFINITY;
 
 		/* Main loop, which repeats until the stopping criteria is reached. */
-		while (!constructiveStopCriteria()) {
+        while (!CL.isEmpty() && !constructiveStopCriteria()) {
 
 			double maxCost = Double.NEGATIVE_INFINITY, minCost = Double.POSITIVE_INFINITY;
 			incumbentCost = ObjFunction.evaluate(incumbentSol);
-			updateCL();
 
 			/*
 			 * Explore all candidate elements to enter the solution, saving the
@@ -183,6 +182,7 @@ public abstract class AbstractGRASP<E> {
 			incumbentSol.add(inCand);
 			ObjFunction.evaluate(incumbentSol);
 			RCL.clear();
+            updateCL();
 
 		}
 
@@ -203,6 +203,10 @@ public abstract class AbstractGRASP<E> {
 
 		bestSol = createEmptySol();
 		for (int i = 0; i < iterations; i++) {
+
+		    if(i == 63){
+                System.out.println("Itearação " + i);
+            }
 			constructiveHeuristic(i);
 			localSearch();
 			if (bestSol.cost > incumbentSol.cost) {

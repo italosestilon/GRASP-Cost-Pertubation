@@ -2,6 +2,7 @@ package problems.qbf.solvers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Random;
 
 import metaheuristics.grasp.AbstractGRASP;
@@ -79,8 +80,12 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	@Override
 	public void updateCL() {
 
-		// do nothing since all elements off the solution are viable candidates.
-
+        /* Adicionando a restrição de adjacência */
+		if (!incumbentSol.isEmpty()) {
+			Integer lastIn = incumbentSol.get(incumbentSol.size() - 1);
+			CL.remove(new Integer(lastIn-1));
+			CL.remove(new Integer(lastIn+1));
+		}
 	}
 
 	/**
@@ -111,8 +116,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
 		do {
 			minDeltaCost = Double.POSITIVE_INFINITY;
-			updateCL();
-				
+
 			// Evaluate insertions
 			for (Integer candIn : CL) {
 				double deltaCost = ObjFunction.evaluateInsertionCost(candIn, incumbentSol);
@@ -132,8 +136,28 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 				}
 			}
 			// Evaluate exchanges
-			for (Integer candIn : CL) {
-				for (Integer candOut : incumbentSol) {
+			for (Integer candOut : incumbentSol) {
+
+				if (candOut-1 >= 0 && !incumbentSol.contains(new Integer(candOut-2))) {
+					Integer candIn = new Integer(candOut-1);
+					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
+					if (deltaCost < minDeltaCost) {
+						minDeltaCost = deltaCost;
+						bestCandIn = candIn;
+						bestCandOut = candOut;
+					}
+				}
+				if (candOut+1 < ObjFunction.getDomainSize() && !incumbentSol.contains(new Integer(candOut+2))) {
+					Integer candIn = new Integer(candOut+1);
+					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
+					if (deltaCost < minDeltaCost) {
+						minDeltaCost = deltaCost;
+						bestCandIn = candIn;
+						bestCandOut = candOut;
+					}
+				}
+
+				for (Integer candIn : CL) {
 					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
 					if (deltaCost < minDeltaCost) {
 						minDeltaCost = deltaCost;
@@ -144,14 +168,17 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			}
 			// Implement the best move, if it reduces the solution cost.
 			if (minDeltaCost < -Double.MIN_VALUE) {
-				if (bestCandOut != null) {
-					incumbentSol.remove(bestCandOut);
-					CL.add(bestCandOut);
-				}
 				if (bestCandIn != null) {
 					incumbentSol.add(bestCandIn);
 					CL.remove(bestCandIn);
 				}
+
+				if (bestCandOut != null) {
+					incumbentSol.remove(bestCandOut);
+					CL.add(bestCandOut);
+                    updateCL();
+				}
+
 				ObjFunction.evaluate(incumbentSol);
 			}
 		} while (minDeltaCost < -Double.MIN_VALUE);
@@ -185,17 +212,23 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		//String path = new File("").getAbsolutePath()+"/";
-		//System.out.println("AbsolutePath: "+path);
-		
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFAC grasp = new GRASP_QBFAC(0.05, 1000, "instances/qbf060");
+		GRASP_QBFAC grasp = new GRASP_QBFAC(0.05, 1000, "instances/qbf040");
 		Solution<Integer> bestSol = grasp.solve();
+
+		Comparator<Integer> cmp = new Comparator<Integer>() {
+			@Override
+			public int compare(Integer first, Integer second) {
+				return first.compareTo(second);
+			}
+		};
+
+		bestSol.sort(cmp);
+
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();
 		long totalTime = endTime - startTime;
 		System.out.println("Time = "+(double)totalTime/(double)1000+" seg");
-
 	}
 
 }
