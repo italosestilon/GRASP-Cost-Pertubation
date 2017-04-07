@@ -1,7 +1,6 @@
 package metaheuristics.grasp;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import problems.Evaluator;
@@ -21,7 +20,7 @@ public abstract class AbstractGRASP<E> {
 	 * flag that indicates whether the code should print more information on
 	 * screen
 	 */
-	public static boolean verbose = true;
+	public static boolean verbose = false;
 
 	/**
 	 * a random number generator
@@ -61,7 +60,7 @@ public abstract class AbstractGRASP<E> {
 	/**
 	 * the number of iterations the GRASP main loop executes.
 	 */
-	protected Integer iterations;
+	protected boolean bestimproving;
 
 	/**
 	 * the Candidate List of elements to enter the solution.
@@ -126,10 +125,10 @@ public abstract class AbstractGRASP<E> {
 	 * @param iterations
 	 *            The number of iterations which the GRASP will be executed.
 	 */
-	public AbstractGRASP(Evaluator<E> objFunction, Double alpha, Integer iterations) {
+	public AbstractGRASP(Evaluator<E> objFunction, Double alpha, boolean bestimproving) {
 		this.ObjFunction = objFunction;
 		this.alpha = alpha;
-		this.iterations = iterations;
+		this.bestimproving = bestimproving;
 	}
 	
 	/**
@@ -139,58 +138,55 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return A feasible solution to the problem being minimized.
 	 */
-	public Solution<E> constructiveHeuristic(int iteration) {
+	public Solution<E> constructiveHeuristic(long iteration) {
 
 		CL = makeCL();
 		RCL = makeRCL();
+		
 		incumbentSol = createEmptySol();
 		incumbentCost = Double.POSITIVE_INFINITY;
-
-		/* Main loop, which repeats until the stopping criteria is reached. */
-        while (!CL.isEmpty() && !constructiveStopCriteria()) {
+		
+		while (!CL.isEmpty() && !constructiveStopCriteria()) {
 
 			double maxCost = Double.NEGATIVE_INFINITY, minCost = Double.POSITIVE_INFINITY;
 			incumbentCost = ObjFunction.evaluate(incumbentSol);
 
-			/*
-			 * Explore all candidate elements to enter the solution, saving the
+			/* Explore all candidate elements to enter the solution, saving the
 			 * highest and lowest cost variation achieved by the candidates.
 			 */
 			for (E c : CL) {
-				Double deltaCost = perturbation(c, iteration) * ObjFunction.evaluateInsertionCost(c, incumbentSol);
+				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
+				deltaCost = deltaCost * perturbation(c, iteration);
 				if (deltaCost < minCost)
 					minCost = deltaCost;
 				if (deltaCost > maxCost)
 					maxCost = deltaCost;
 			}
 
-			/*
-			 * Among all candidates, insert into the RCL those with the highest
+			/* Among all candidates, insert into the RCL those with the highest
 			 * performance using parameter alpha as threshold.
 			 */
 			for (E c : CL) {
-				Double deltaCost = perturbation(c, iteration) * ObjFunction.evaluateInsertionCost(c, incumbentSol);
+				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
+				deltaCost = deltaCost * perturbation(c, iteration);
 				if (deltaCost <= minCost + alpha * (maxCost - minCost)) {
 					RCL.add(c);
 				}
 			}
 
-			/* Choose a candidate randomly from the RCL */
+			// Choose a candidate randomly from the RCL
 			int rndIndex = rng.nextInt(RCL.size());
 			E inCand = RCL.get(rndIndex);
 			CL.remove(inCand);
 			incumbentSol.add(inCand);
 			ObjFunction.evaluate(incumbentSol);
+			
 			RCL.clear();
-            updateCL();
-
+			updateCL();
 		}
-
+		
 		return incumbentSol;
 	}
-
-
-	public abstract Double perturbation(E c, int iteration);
 
 	/**
 	 * The GRASP mainframe. It consists of a loop, in which each iteration goes
@@ -202,13 +198,12 @@ public abstract class AbstractGRASP<E> {
 	public Solution<E> solve() {
 
 		bestSol = createEmptySol();
-		for (int i = 0; i < iterations; i++) {
-
-		    if(i == 63){
-                System.out.println("Itearação " + i);
-            }
+		
+		for (long i = 0; !solveStopCriteria(bestSol.cost); i++) {
+			
 			constructiveHeuristic(i);
 			localSearch();
+			
 			if (bestSol.cost > incumbentSol.cost) {
 				bestSol = new Solution<E>(incumbentSol);
 				if (verbose)
@@ -230,4 +225,7 @@ public abstract class AbstractGRASP<E> {
 		return (incumbentCost > incumbentSol.cost) ? false : true;
 	}
 
+	public abstract Double perturbation(E c, long iteration);
+	
+	public abstract boolean solveStopCriteria(Double bestCost);
 }

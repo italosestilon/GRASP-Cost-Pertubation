@@ -2,8 +2,6 @@ package problems;
 
 import solutions.Solution;
 
-import java.util.ArrayList;
-
 /**
  * The Evaluator interface gives to a problem the required functionality to
  * obtain a mapping of a solution (n-dimensional array of elements of generic
