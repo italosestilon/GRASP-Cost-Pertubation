@@ -139,7 +139,7 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return A feasible solution to the problem being minimized.
 	 */
-	public Solution<E> constructiveHeuristic() {
+	public Solution<E> constructiveHeuristic(int iteration) {
 
 		CL = makeCL();
 		RCL = makeRCL();
@@ -158,7 +158,7 @@ public abstract class AbstractGRASP<E> {
 			 * highest and lowest cost variation achieved by the candidates.
 			 */
 			for (E c : CL) {
-				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
+				Double deltaCost = perturbation(c, iteration) * ObjFunction.evaluateInsertionCost(c, incumbentSol);
 				if (deltaCost < minCost)
 					minCost = deltaCost;
 				if (deltaCost > maxCost)
@@ -170,7 +170,7 @@ public abstract class AbstractGRASP<E> {
 			 * performance using parameter alpha as threshold.
 			 */
 			for (E c : CL) {
-				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
+				Double deltaCost = perturbation(c, iteration) * ObjFunction.evaluateInsertionCost(c, incumbentSol);
 				if (deltaCost <= minCost + alpha * (maxCost - minCost)) {
 					RCL.add(c);
 				}
@@ -189,6 +189,9 @@ public abstract class AbstractGRASP<E> {
 		return incumbentSol;
 	}
 
+
+	public abstract Double perturbation(E c, int iteration);
+
 	/**
 	 * The GRASP mainframe. It consists of a loop, in which each iteration goes
 	 * through the constructive heuristic and local search. The best solution is
@@ -200,15 +203,13 @@ public abstract class AbstractGRASP<E> {
 
 		bestSol = createEmptySol();
 		for (int i = 0; i < iterations; i++) {
-			constructiveHeuristic();
+			constructiveHeuristic(i);
 			localSearch();
 			if (bestSol.cost > incumbentSol.cost) {
 				bestSol = new Solution<E>(incumbentSol);
 				if (verbose)
 					System.out.println("(Iter. " + i + ") BestSol = " + bestSol);
 			}
-
-			ObjFunction.updateFrequency(bestSol, i);
 		}
 
 		return bestSol;

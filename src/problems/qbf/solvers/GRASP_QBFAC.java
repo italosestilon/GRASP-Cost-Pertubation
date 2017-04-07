@@ -2,6 +2,7 @@ package problems.qbf.solvers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Random;
 
 import metaheuristics.grasp.AbstractGRASP;
 import problems.qbf.QBF_Inverse;
@@ -17,6 +18,8 @@ import solutions.Solution;
  * @author ccavellucci, fusberti
  */
 public class GRASP_QBFAC extends AbstractGRASP<Integer> {
+
+	int frequency[];
 
 	/**
 	 * Constructor for the GRASP_QBFAC class. An inverse QBF with adjacency constraints
@@ -35,6 +38,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	 */
 	public GRASP_QBFAC(Double alpha, Integer iterations, String filename) throws IOException {
 		super(new QBF_Inverse(filename), alpha, iterations);
+		frequency = new int[ObjFunction.getDomainSize()];
 	}
 
 	/*
@@ -152,7 +156,27 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			}
 		} while (minDeltaCost < -Double.MIN_VALUE);
 
+		for(Integer i : incumbentSol){
+			frequency[i]++;
+		}
+
 		return null;
+	}
+
+	@Override
+	public Double perturbation(Integer c, int iteration) {
+		if(iteration < 3) return 1.0;
+		Double perturbation = 1.0;
+		Random rnd = new Random(0);
+		if(iteration % 3 == 1){
+			perturbation = (1.25 + 0.75*frequency[c]/iteration);
+		}else if(iteration % 3 == 0){
+			perturbation = (2 - 0.75*frequency[c]/iteration);
+		}else{
+			perturbation = 2.0*rnd.nextDouble();
+		}
+
+		return perturbation;
 	}
 
 	/**

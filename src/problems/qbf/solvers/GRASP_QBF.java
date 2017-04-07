@@ -154,6 +154,11 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 		return null;
 	}
 
+	@Override
+	public Double perturbation(Integer c, int iteration) {
+		return null;
+	}
+
 	/**
 	 * A main method used for testing the GRASP metaheuristic.
 	 * 

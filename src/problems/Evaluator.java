@@ -76,7 +76,5 @@ public interface Evaluator<E> {
 	 * @return the cost variation resulting from the elements exchange.
 	 */
 	public abstract Double evaluateExchangeCost(E elemIn, E elemOut, Solution<E> sol);
-
-	public abstract void updateFrequency(ArrayList<E> solution, Integer iteration);
 	
 }

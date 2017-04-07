@@ -42,16 +42,6 @@ public class QBF implements Evaluator<Integer> {
 	 * The matrix A of coefficients for the QBF f(x) = x'.A.x
 	 */
 	public Double[][] A;
-	public Double[][] A_1;
-	public Double[][] A_2;
-	public Double[][] A_3;
-
-	//Frequency
-	public int frequency[];
-
-	private Integer frequencyUpdated = 0;
-	private int round = 0;
-	private Integer iteration;
 
 	/**
 	 * The constructor for QuadracticBinaryFunction class. The filename of the
@@ -66,10 +56,6 @@ public class QBF implements Evaluator<Integer> {
 	public QBF(String filename) throws IOException {
 		size = readInput(filename);
 		variables = allocateVariables();
-		frequency = new int[size];
-		A_1 = A.clone();
-		A_2 = A.clone();
-		A_3 = A.clone();
 	}
 
 	/**
@@ -220,16 +206,6 @@ public class QBF implements Evaluator<Integer> {
 
 	}
 
-	@Override
-	public void updateFrequency(ArrayList<Integer> solution, Integer iteration) {
-		for(Integer i : solution){
-			frequency[i]++;
-		}
-		this.iteration = iteration;
-		frequencyUpdated = frequencyUpdated + 1;
-		round++;
-	}
-
 	/**
 	 * Determines the contribution to the QBF objective function from the
 	 * exchange of two elements one belonging to the solution and the other not.
@@ -246,8 +222,6 @@ public class QBF implements Evaluator<Integer> {
 	public Double evaluateExchangeQBF(int in, int out) {
 
 		Double sum = 0.0;
-
-		Double A[][] = costs();
 
 		if (in == out)
 			return 0.0;
@@ -281,8 +255,6 @@ public class QBF implements Evaluator<Integer> {
 
 		Double sum = 0.0;
 
-		Double A[][] = costs();
-
 		for (int j = 0; j < size; j++) {
 			if (i != j)
 				sum += variables[j] * (A[i][j] + A[j][i]);
@@ -290,32 +262,6 @@ public class QBF implements Evaluator<Integer> {
 		sum += A[i][i];
 
 		return sum;
-	}
-
-	private Double[][] costs() {
-		if(frequencyUpdated < 3) return A;
-		calculateCosts();
-		Double[][] c;
-		if(round % 3 == 0){
-			c = A_2;
-		}else if(round % 3 == 1){
-			c = A_1;
-		}else{
-			c = A_3;
-		}
-
-		return c;
-	}
-
-	private void calculateCosts(){
-
-		Random rnd = new Random(0);
-
-		for(int i = 0; i < size; i++){
-			A_1[i][i] = A[i][i] * (1.25 + 0.75*frequency[i]/iteration);
-			A_2[i][i] = A[i][i] * (2 - 0.75*frequency[i]/iteration);
-			A_3[i][i] = 2*rnd.nextDouble();
-		}
 	}
 
 	/**
