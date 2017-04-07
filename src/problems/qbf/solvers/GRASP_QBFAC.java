@@ -165,7 +165,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 		//System.out.println("AbsolutePath: "+path);
 		
 		long startTime = System.currentTimeMillis();
-		GRASP_QBFAC grasp = new GRASP_QBFAC(0.05, 1000, "instances/qbf020");
+		GRASP_QBFAC grasp = new GRASP_QBFAC(0.05, 1000, "instances/qbf060");
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();

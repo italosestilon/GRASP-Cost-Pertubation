@@ -2,6 +2,8 @@ package problems;
 
 import solutions.Solution;
 
+import java.util.ArrayList;
+
 /**
  * The Evaluator interface gives to a problem the required functionality to
  * obtain a mapping of a solution (n-dimensional array of elements of generic
@@ -74,5 +76,7 @@ public interface Evaluator<E> {
 	 * @return the cost variation resulting from the elements exchange.
 	 */
 	public abstract Double evaluateExchangeCost(E elemIn, E elemOut, Solution<E> sol);
+
+	public abstract void updateFrequency(ArrayList<E> solution, Integer iteration);
 	
 }

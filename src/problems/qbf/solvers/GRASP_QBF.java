@@ -2,6 +2,7 @@ package problems.qbf.solvers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import metaheuristics.grasp.AbstractGRASP;
 import problems.qbf.QBF_Inverse;
@@ -16,7 +17,6 @@ import solutions.Solution;
  * @author ccavellucci, fusberti
  */
 public class GRASP_QBF extends AbstractGRASP<Integer> {
-
 	/**
 	 * Constructor for the GRASP_QBF class. An inverse QBF objective function is
 	 * passed as argument for the superclass constructor.
@@ -164,7 +164,7 @@ public class GRASP_QBF extends AbstractGRASP<Integer> {
 		//System.out.println("AbsolutePath: "+path);
 		
 		long startTime = System.currentTimeMillis();
-		GRASP_QBF grasp = new GRASP_QBF(0.05, 1000, "instances/qbf020");
+		GRASP_QBF grasp = new GRASP_QBF(0.05, 1000, "instances/qbf040");
 		Solution<Integer> bestSol = grasp.solve();
 		System.out.println("maxVal = " + bestSol);
 		long endTime   = System.currentTimeMillis();

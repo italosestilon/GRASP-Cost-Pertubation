@@ -1,6 +1,7 @@
 package metaheuristics.grasp;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import problems.Evaluator;
@@ -206,6 +207,8 @@ public abstract class AbstractGRASP<E> {
 				if (verbose)
 					System.out.println("(Iter. " + i + ") BestSol = " + bestSol);
 			}
+
+			ObjFunction.updateFrequency(bestSol, i);
 		}
 
 		return bestSol;
