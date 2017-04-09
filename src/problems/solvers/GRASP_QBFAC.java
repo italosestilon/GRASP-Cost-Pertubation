@@ -148,29 +148,35 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 				}
 			}
 			
-			// Evaluate removals
-			for (Integer candOut : incumbentSol) {
-				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
-				if (deltaCost < minDeltaCost) {
-					minDeltaCost = deltaCost;
-					bestCandIn = null;
-					bestCandOut = candOut;
-				}
-			}
-			
-			// Evaluate exchanges
-			for (Integer candOut : incumbentSol) {
-
-				updateCL();
+			if (bestimproving || minDeltaCost.compareTo(Double.POSITIVE_INFINITY) == 0) {
 				
-				for (Integer candIn : CL) {
-					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
+				// Evaluate removals
+				for (Integer candOut : incumbentSol) {
+					double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
 					if (deltaCost < minDeltaCost) {
 						minDeltaCost = deltaCost;
-						bestCandIn = candIn;
+						bestCandIn = null;
 						bestCandOut = candOut;
 					}
 				}
+				
+			}
+			
+			if (bestimproving || minDeltaCost.compareTo(Double.POSITIVE_INFINITY) == 0) {
+				
+				// Evaluate exchanges
+				for (Integer candOut : incumbentSol) {	
+					updateCL();					
+					for (Integer candIn : CL) {
+						double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
+						if (deltaCost < minDeltaCost) {
+							minDeltaCost = deltaCost;
+							bestCandIn = candIn;
+							bestCandOut = candOut;
+						}
+					}
+				}
+				
 			}
 			
 			// Implement the best move, if it reduces the solution cost
@@ -189,7 +195,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 				ObjFunction.evaluate(incumbentSol);
 			}
 			
-		} while (bestimproving && minDeltaCost < -Double.MIN_VALUE);
+		} while (minDeltaCost < -Double.MIN_VALUE);
 
 		for (Integer i : incumbentSol) {
 			frequency[i]++;
@@ -240,7 +246,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 				
 		boolean[] flag = {true, false};
 		Double[] alpha = {0.2, 0.8};
-
+				
 		for (int index = 0; index < 5; ++index) { // alterna as instâncias 
 			
 			String path = "instances/"+filename[index];
@@ -248,6 +254,8 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			flagCost = baseCost[index];
 			
 			for (int i = 0; i < 8; ++i) {
+				
+				if ((i%4)/2 == 1) continue;
 				
 				System.out.print("Instance = "+filename[index]+", ");
 				System.out.print("Alpha = "+alpha[i/4]+", ");
