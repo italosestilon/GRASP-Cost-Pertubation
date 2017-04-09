@@ -3,6 +3,7 @@ package problems.solvers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Random;
 
 import metaheuristics.grasp.AbstractGRASP;
 import metaheuristics.grasp.Pair;
@@ -20,14 +21,13 @@ import solutions.Solution;
  */
 public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
-	private long frequency[];
-	
-	private boolean perturb;
-	
 	private static Double flagCost = null;
-	
 	private static long startTime;
 	private static long endTime;
+	
+	private long frequency[];	
+	private boolean perturb;	
+	private Random generator;
 	
 	/**
 	 * Constructor for the GRASP_QBFAC class. An inverse QBF with adjacency constraints
@@ -48,6 +48,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 		super(new QBFAC_Inverse(filename), alpha, bestimproving);
 		this.perturb = perturb;
 		this.frequency = new long[ObjFunction.getDomainSize()];
+		this.generator = new Random(0);
 	}
 
 	/* (non-Javadoc)
@@ -212,7 +213,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			return (2 - 0.75 * frequency[c] / iteration);
 		}
 
-		return 2.0;
+		return 2.0 * generator.nextDouble();
 	}
 	
 	@Override
@@ -238,7 +239,6 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 		String[] Search = {"First-improving", "Best-improving"};
 				
 		boolean[] flag = {true, false};
-		
 		Double[] alpha = {0.2, 0.8};
 
 		for (int index = 0; index < 5; ++index) { // alterna as instâncias 
@@ -281,4 +281,3 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	}
 
 }
-
