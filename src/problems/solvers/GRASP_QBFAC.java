@@ -131,11 +131,10 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
 		Double minDeltaCost;
 		Integer bestCandIn = null, bestCandOut = null;
-
-		do {
-			
-			minDeltaCost = Double.POSITIVE_INFINITY;
-			
+		
+		while (true) 
+		{
+			minDeltaCost = Double.POSITIVE_INFINITY;			
 			updateCL();
 			
 			// Evaluate insertions
@@ -145,38 +144,34 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 					minDeltaCost = deltaCost;
 					bestCandIn = candIn;
 					bestCandOut = null;
+					if (!bestimproving) break;
 				}
 			}
 			
-			if (bestimproving || minDeltaCost.compareTo(Double.POSITIVE_INFINITY) == 0) {
+			// Evaluate removals
+			for (Integer candOut : incumbentSol) {
+				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
+				if (deltaCost < minDeltaCost) {
+					minDeltaCost = deltaCost;
+					bestCandIn = null;
+					bestCandOut = candOut;
+					if (!bestimproving) break;
+				}
+			}
 				
-				// Evaluate removals
-				for (Integer candOut : incumbentSol) {
-					double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
+			// Evaluate exchanges
+			for (Integer candOut : incumbentSol) {	
+				updateCL();					
+				for (Integer candIn : CL) {
+					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
 					if (deltaCost < minDeltaCost) {
 						minDeltaCost = deltaCost;
-						bestCandIn = null;
+						bestCandIn = candIn;
 						bestCandOut = candOut;
+						if (!bestimproving) break;
 					}
 				}
-				
-			}
-			
-			if (bestimproving || minDeltaCost.compareTo(Double.POSITIVE_INFINITY) == 0) {
-				
-				// Evaluate exchanges
-				for (Integer candOut : incumbentSol) {	
-					updateCL();					
-					for (Integer candIn : CL) {
-						double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
-						if (deltaCost < minDeltaCost) {
-							minDeltaCost = deltaCost;
-							bestCandIn = candIn;
-							bestCandOut = candOut;
-						}
-					}
-				}
-				
+				if (!bestimproving && minDeltaCost.compareTo(Double.POSITIVE_INFINITY) != 0) break;
 			}
 			
 			// Implement the best move, if it reduces the solution cost
@@ -194,9 +189,11 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
 				ObjFunction.evaluate(incumbentSol);
 			}
-			
-		} while (minDeltaCost < -Double.MIN_VALUE);
-
+			else { // não obteve melhorias
+				break;
+			}
+		}
+		
 		for (Integer i : incumbentSol) {
 			frequency[i]++;
 		}
