@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 
 import metaheuristics.grasp.AbstractGRASP;
+import metaheuristics.grasp.Pair;
 import problems.qbfac.QBFAC_Inverse;
 import solutions.Solution;
 
@@ -84,7 +85,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	@Override
 	public void updateCL() {
 		
-        // Adicionando a restrição de adjacência
+        // Adicionando a restriÃ§Ã£o de adjacÃªncia
 		/*if (!incumbentSol.isEmpty()) {
 			Integer lastIn = incumbentSol.get(incumbentSol.size() - 1);
 			CL.remove(new Integer(lastIn-1));
@@ -199,7 +200,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	@Override
 	public Double perturbation(Integer c, long iteration) {
 		
-		if (iteration < 3 || !perturb) { // é para perturbar?? 
+		if (iteration < 3 || !perturb) { // Ã© para perturbar?? 
 			return 1.0;
 		}
 			
@@ -234,10 +235,13 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 		String[] filename = {"qbf020", "qbf040", "qbf060", "qbf080", "qbf100"};
 		Double[] baseCost = {-104.0, -251.0, null, null, null};
 		
+		String[] Search = {"First-improving", "Best-improving"};
+				
 		boolean[] flag = {true, false};
-		Double[] alpha = {0.1, 0.9};
+		
+		Double[] alpha = {0.2, 0.8};
 
-		for (int index = 0; index < 5; ++index) { // alterna as instâncias 
+		for (int index = 0; index < 5; ++index) { // alterna as instÃ¢ncias 
 			
 			String path = "instances/"+filename[index];
 			
@@ -245,17 +249,14 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			
 			for (int i = 0; i < 8; ++i) {
 				
-				boolean bestimp = flag[(i%4)/2];
-				boolean perturb = flag[i%2];
-				
-				System.out.print("Instances = "+filename[index]+", ");
+				System.out.print("Instance = "+filename[index]+", ");
 				System.out.print("Alpha = "+alpha[i/4]+", ");
-				System.out.print("Perturbation = "+perturb+", ");
-				System.out.print("Best-improving = "+bestimp+", ");
+				System.out.print("Cost Perturbation = "+flag[i%2]+", ");
+				System.out.print(Search[(i%4)/2]+", ");
 				
 				startTime = System.currentTimeMillis();
-				GRASP_QBFAC grasp = new GRASP_QBFAC(alpha[i/4], bestimp, perturb, path);
-				Solution<Integer> bestSol = grasp.solve();
+				GRASP_QBFAC grasp = new GRASP_QBFAC(alpha[i/4], flag[(i%4)/2], flag[i%2], path);
+				Pair<Solution<Integer>, Solution<Integer>> bestSol = grasp.solve();
 				
 				Comparator<Integer> cmp = new Comparator<Integer>() {
 			        @Override
@@ -264,16 +265,20 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			        }
 				};
 				
-				bestSol.sort(cmp);
+				bestSol.getL().sort(cmp);
+				bestSol.getR().sort(cmp);
 				
 				long totalTime = endTime - startTime;
 				double seg = (double)totalTime/(double)1000;
+				
 				System.out.println("Time = "+seg+" seg");
-				System.out.println("MaxVal = " + bestSol+"\n");
+				System.out.println("MaxBCH = " + bestSol.getR());
+				System.out.println("MaxVal = " + bestSol.getL()+"\n");
 			}
 		}
 		
-		System.out.print("It's finished!!!");
+		//System.out.print("It's finished!!!");
 	}
 
 }
+
