@@ -1,6 +1,8 @@
 package metaheuristics.grasp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import problems.Evaluator;
@@ -140,6 +142,8 @@ public abstract class AbstractGRASP<E> {
 	 */
 	public Solution<E> constructiveHeuristic(long iteration) {
 
+		Map<E,Double> deltaCostMap = new HashMap<E,Double>();
+		 
 		CL = makeCL();
 		RCL = makeRCL();
 		
@@ -157,6 +161,7 @@ public abstract class AbstractGRASP<E> {
 			for (E c : CL) {
 				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
 				deltaCost = deltaCost * perturbation(c, iteration);
+				deltaCostMap.put(c, deltaCost);
 				if (deltaCost < minCost)
 					minCost = deltaCost;
 				if (deltaCost > maxCost)
@@ -167,8 +172,7 @@ public abstract class AbstractGRASP<E> {
 			 * performance using parameter alpha as threshold.
 			 */
 			for (E c : CL) {
-				Double deltaCost = ObjFunction.evaluateInsertionCost(c, incumbentSol);
-				deltaCost = deltaCost * perturbation(c, iteration);
+				Double deltaCost = deltaCostMap.get(c);
 				if (deltaCost <= minCost + alpha * (maxCost - minCost)) {
 					RCL.add(c);
 				}
