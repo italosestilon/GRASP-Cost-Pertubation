@@ -195,13 +195,19 @@ public abstract class AbstractGRASP<E> {
 	 * 
 	 * @return The best feasible solution obtained throughout all iterations.
 	 */
-	public Solution<E> solve() {
+	public Pair<Solution<E>, Solution<E>> solve() {
 
+        Solution<E> bestConst = createEmptySol();		
 		bestSol = createEmptySol();
 		
 		for (long i = 0; !solveStopCriteria(bestSol.cost); i++) {
 			
 			constructiveHeuristic(i);
+			
+			if (bestConst.cost > incumbentSol.cost) {
+				bestConst = new Solution<E>(incumbentSol);
+			}
+			
 			localSearch();
 			
 			if (bestSol.cost > incumbentSol.cost) {
@@ -210,8 +216,8 @@ public abstract class AbstractGRASP<E> {
 					System.out.println("(Iter. " + i + ") BestSol = " + bestSol);
 			}
 		}
-
-		return bestSol;
+		
+		return new Pair<Solution<E>, Solution<E>> (bestSol, bestConst);
 	}
 
 	/**
