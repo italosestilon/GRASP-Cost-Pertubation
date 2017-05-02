@@ -132,11 +132,11 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 		Double minDeltaCost;
 		Integer bestCandIn = null, bestCandOut = null;
 		
-		while (true) 
+		while (true)
 		{
-			minDeltaCost = Double.POSITIVE_INFINITY;			
+			minDeltaCost = Double.POSITIVE_INFINITY;
 			updateCL();
-			
+
 			// Evaluate insertions
 			for (Integer candIn : CL) {
 				double deltaCost = ObjFunction.evaluateInsertionCost(candIn, incumbentSol);
@@ -147,7 +147,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 					if (!bestimproving) break;
 				}
 			}
-			
+
 			// Evaluate removals
 			for (Integer candOut : incumbentSol) {
 				double deltaCost = ObjFunction.evaluateRemovalCost(candOut, incumbentSol);
@@ -158,10 +158,10 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 					if (!bestimproving) break;
 				}
 			}
-				
+
 			// Evaluate exchanges
-			for (Integer candOut : incumbentSol) {	
-				updateCL();					
+			for (Integer candOut : incumbentSol) {
+				updateCL();
 				for (Integer candIn : CL) {
 					double deltaCost = ObjFunction.evaluateExchangeCost(candIn, candOut, incumbentSol);
 					if (deltaCost < minDeltaCost) {
@@ -173,17 +173,17 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 				}
 				if (!bestimproving && minDeltaCost.compareTo(Double.POSITIVE_INFINITY) != 0) break;
 			}
-			
+
 			// Implement the best move, if it reduces the solution cost
 			if (minDeltaCost < -Double.MIN_VALUE) {
-				
+
 				if (bestCandIn != null) {
 					incumbentSol.add(bestCandIn);
 					CL.remove(bestCandIn);
 				}
 
 				if (bestCandOut != null) {
-					incumbentSol.remove(bestCandOut);				
+					incumbentSol.remove(bestCandOut);
 					CL.add(bestCandOut);
 				}
 
@@ -236,53 +236,52 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 	 */
 	public static void main(String[] args) throws IOException {
 
-		String[] filename = {"qbf020", "qbf040", "qbf060", "qbf080", "qbf100"};
-		Double[] baseCost = {-104.0, -251.0, null, null, null};
-		
-		String[] Search = {"First-improving", "Best-improving"};
+		String filename = args[0];
+
+		Double[] baseCost = {null};
+
+		String search = args[1];
+		//String[] Search = {"First-improving", "Best-improving"};
+
+		boolean flag = Boolean.valueOf(args[2]);
+
+		Double alpha = Double.valueOf(args[3]);
+
+		//boolean[] flag = {true, false};
+		//Double[] alpha = {0.2, 0.8};
 				
-		boolean[] flag = {true, false};
-		Double[] alpha = {0.2, 0.8};
-				
-		for (int index = 0; index < 5; ++index) { // alterna as instâncias 
-			
-			String path = "instances/"+filename[index];
-			
-			flagCost = baseCost[index];
-			
-			for (int i = 0; i < 8; ++i) {
-				
-				if ((i%4)/2 == 1) continue;
-				
-				System.out.print("Instance = "+filename[index]+", ");
-				System.out.print("Alpha = "+alpha[i/4]+", ");
-				System.out.print("Cost Perturbation = "+flag[i%2]+", ");
-				System.out.print(Search[(i%4)/2]+", ");
-				
-				startTime = System.currentTimeMillis();
-				GRASP_QBFAC grasp = new GRASP_QBFAC(alpha[i/4], flag[(i%4)/2], flag[i%2], path);
-				Pair<Solution<Integer>, Solution<Integer>> bestSol = grasp.solve();
-				
-				Comparator<Integer> cmp = new Comparator<Integer>() {
-			        @Override
-			        public int compare(Integer first, Integer second) {
-			            return first.compareTo(second);
-			        }
-				};
-				
-				bestSol.getL().sort(cmp);
-				bestSol.getR().sort(cmp);
-				
-				long totalTime = endTime - startTime;
-				double seg = (double)totalTime/(double)1000;
-				
-				System.out.println("Time = "+seg+" seg");
-				System.out.println("MaxBCH = " + bestSol.getR());
-				System.out.println("MaxVal = " + bestSol.getL()+"\n");
+
+
+		String path = "instances/"+filename;
+
+
+		System.out.print("Instance = "+filename+", ");
+		System.out.print("Alpha = "+alpha+", ");
+		System.out.print("Cost Perturbation = "+flag +", ");
+		System.out.print(search+", ");
+
+		startTime = System.currentTimeMillis();
+		GRASP_QBFAC grasp = new GRASP_QBFAC(alpha, flag, flag, path);
+		Pair<Solution<Integer>, Solution<Integer>> bestSol = grasp.solve();
+
+		Comparator<Integer> cmp = new Comparator<Integer>() {
+			@Override
+			public int compare(Integer first, Integer second) {
+				return first.compareTo(second);
 			}
-		}
+		};
+
+		bestSol.getL().sort(cmp);
+		bestSol.getR().sort(cmp);
+
+		long totalTime = endTime - startTime;
+		double seg = (double)totalTime/(double)1000;
+
+		System.out.println("Time = "+seg+" seg");
+		System.out.println("MaxBCH = " + bestSol.getR());
+		System.out.println("MaxVal = " + bestSol.getL()+"\n");
+	}
 		
 		//System.out.print("It's finished!!!");
-	}
 
 }
