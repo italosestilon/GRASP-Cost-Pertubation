@@ -249,39 +249,35 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
 		//boolean[] flag = {true, false};
 		//Double[] alpha = {0.2, 0.8};
-				
+
+        String path = "instance/"+filename;
 
 
-		String path = "instances/"+filename;
+        System.out.print("Instance = "+filename+", ");
+        System.out.print("Alpha = "+alpha+", ");
+        System.out.print("Cost Perturbation = "+flag+", ");
+        System.out.print(search+", ");
 
+        startTime = System.currentTimeMillis();
+        GRASP_QBFAC grasp = new GRASP_QBFAC(alpha, flag, flag, path);
+        Pair<Solution<Integer>, Solution<Integer>> bestSol = grasp.solve();
 
-		System.out.print("Instance = "+filename+", ");
-		System.out.print("Alpha = "+alpha+", ");
-		System.out.print("Cost Perturbation = "+flag +", ");
-		System.out.print(search+", ");
+        Comparator<Integer> cmp = new Comparator<Integer>() {
+            @Override
+            public int compare(Integer first, Integer second) {
+                return first.compareTo(second);
+            }
+        };
 
-		startTime = System.currentTimeMillis();
-		GRASP_QBFAC grasp = new GRASP_QBFAC(alpha, flag, flag, path);
-		Pair<Solution<Integer>, Solution<Integer>> bestSol = grasp.solve();
+        bestSol.getL().sort(cmp);
+        bestSol.getR().sort(cmp);
 
-		Comparator<Integer> cmp = new Comparator<Integer>() {
-			@Override
-			public int compare(Integer first, Integer second) {
-				return first.compareTo(second);
-			}
-		};
+        long totalTime = endTime - startTime;
+        double seg = (double)totalTime/(double)1000;
 
-		bestSol.getL().sort(cmp);
-		bestSol.getR().sort(cmp);
-
-		long totalTime = endTime - startTime;
-		double seg = (double)totalTime/(double)1000;
-
-		System.out.println("Time = "+seg+" seg");
-		System.out.println("MaxBCH = " + bestSol.getR());
-		System.out.println("MaxVal = " + bestSol.getL()+"\n");
+        System.out.println("Time = "+seg+" seg");
+        System.out.println("MaxBCH = " + bestSol.getR());
+        System.out.println("MaxVal = " + bestSol.getL()+"\n");
 	}
-		
 		//System.out.print("It's finished!!!");
-
 }
