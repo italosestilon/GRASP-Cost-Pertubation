@@ -238,7 +238,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
 		String filename = args[0];
 
-		Double[] baseCost = {null};
+		Double[] baseCost = {104.0, null};
 
 		String search = args[1];
 		//String[] Search = {"First-improving", "Best-improving"};
@@ -247,10 +247,12 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 
 		Double alpha = Double.valueOf(args[3]);
 
+		flagCost = null;
+
 		//boolean[] flag = {true, false};
 		//Double[] alpha = {0.2, 0.8};
 
-        String path = "instance/"+filename;
+        String path = "instances/"+filename;
 
 
         System.out.print("Instance = "+filename+", ");
