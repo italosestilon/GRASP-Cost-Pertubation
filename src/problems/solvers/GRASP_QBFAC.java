@@ -228,7 +228,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			return true;
 		}
 		
-		return ((endTime - startTime) >= 1800000); //30*60*1000 30min
+		return ((endTime - startTime) >= 10*60*1000); //30*60*1000 30min
 	}
 
 	/**
@@ -243,9 +243,9 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 		String search = args[1];
 		//String[] Search = {"First-improving", "Best-improving"};
 
-		boolean flag = Boolean.valueOf(args[2]);
+		boolean flag = true;
 
-		Double alpha = Double.valueOf(args[3]);
+		Double alpha = Double.valueOf(args[2]);
 
 		flagCost = null;
 
@@ -255,10 +255,10 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
         String path = "instances/"+filename;
 
 
-        System.out.print("Instance = "+filename+", ");
+        /*System.out.print("Instance = "+filename+", ");
         System.out.print("Alpha = "+alpha+", ");
         System.out.print("Cost Perturbation = "+flag+", ");
-        System.out.print(search+", ");
+        System.out.print(search+", ");*/
 
         startTime = System.currentTimeMillis();
         GRASP_QBFAC grasp = new GRASP_QBFAC(alpha, flag, flag, path);
@@ -277,9 +277,10 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
         long totalTime = endTime - startTime;
         double seg = (double)totalTime/(double)1000;
 
-        System.out.println("Time = "+seg+" seg");
-        System.out.println("MaxBCH = " + bestSol.getR());
-        System.out.println("MaxVal = " + bestSol.getL()+"\n");
+        //System.out.println("Time = "+seg+" seg");
+        //System.out.println("MaxBCH = " + bestSol.getR());
+        //System.out.println("MaxVal = " + bestSol.getL()+"\n");
+        System.out.println((-1)*bestSol.getL().cost);
 	}
 		//System.out.print("It's finished!!!");
 }

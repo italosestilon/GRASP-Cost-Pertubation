@@ -17,7 +17,7 @@ import solutions.Solution;
  * are considered.
  * 
  * [1] Kochenberger, et al. The unconstrained binary quadratic programming
- * problem: a survey. J Comb Optim (2014) 28:58–81. DOI
+ * problem: a survey. J Comb Optim (2014) 28:5881. DOI
  * 10.1007/s10878-014-9734-0.
  * 
  * @author ccavellucci, fusberti
