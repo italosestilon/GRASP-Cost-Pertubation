@@ -228,7 +228,7 @@ public class GRASP_QBFAC extends AbstractGRASP<Integer> {
 			return true;
 		}
 		
-		return ((endTime - startTime) >= 10*60*1000); //30*60*1000 30min
+		return ((endTime - startTime) >= 1*60*1000); //30*60*1000 30min
 	}
 
 	/**
